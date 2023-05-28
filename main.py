@@ -21,7 +21,7 @@ for region in regions:
         response = requests.get(url, headers={'X-Region': region})
         end = time.time()
 
-        status_code = response.status_code
+        status_code = int(response.status_code)
         connection_time = end - start
 
         if "https://" in url:
@@ -29,12 +29,26 @@ for region in regions:
         else:
             urlfix = url.replace('http://', '')
 
-        print(f"Сайт: {url}\nРегион: {region}\nВремя подключения: {connection_time}s\nСтатус: {status_code}\n")
+        if status_code == 200:
+            status_code = "200 (OK)"
+        elif status_code == 404:
+            status_code = "404 (NOT FOUND)"
+        elif status_code == 403:
+            status_code = "403 (FORBIDDEN)"
+        elif status_code == 429:
+            status_code = "429 (RATE LIMIT)"
+
+
+        print(f"Сайт: {url}\nРегион: {region}\nВремя подключения: {connection_time:.3f}s\nСтатус: {status_code}\n")
         
-        file.write(f'Сайт: {url}\nРегион: {region}\nВремя подключения: {connection_time}s\nСтатус: {status_code}\n')
+        file.write(f'Сайт: {url}\nРегион: {region}\nВремя подключения: {connection_time:.3f}s\nСтатус: {status_code}\n')
 
     except requests.exceptions.RequestException as e:
         print(f"Сайт в регеоне {region} отключен! Ошибка: {e}")
         file.write(f'Сайт: {url}\nРегион: {region}\nОшибка: {e}\n')
+
+for a in range(5):
+    file.write("\n")
+file.write("Made by kararasenok_gd | https://github.com/kararasenok-gd/AllRegionHostChecker/")
 
 file.close()
